@@ -1,3 +1,2 @@
 command.success=Seed has been successfully copied to your clipboard!
 command.failure=Command sender is not a player, and/or the world is not a server! Failed to copy!
-command.notopped=You must be opped in order to run this command. If this does not seem right, talk to your server owner about changing that setting.
