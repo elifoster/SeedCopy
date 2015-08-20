@@ -26,7 +26,7 @@ public class Config {
         Configuration config = new Configuration(new File(configurationDir, "SeedCopy.cfg"));
         config.load();
 
-        enableLogging = config.get("Toggle", "Enable debug logging", false).getBoolean(false); //Change this before push
+        enableLogging = config.get("Toggle", "Enable debug logging", false).getBoolean(false);
 
         config.save();
     }
