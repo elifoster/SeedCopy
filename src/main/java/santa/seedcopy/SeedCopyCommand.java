@@ -11,7 +11,6 @@ import net.minecraft.world.World;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.util.*;
 import java.util.List;
 
 public class SeedCopyCommand implements ICommand {
@@ -39,15 +38,11 @@ public class SeedCopyCommand implements ICommand {
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         SeedCopyLogger.printLogMessage("About to be processed");
-
         World world = sender.getEntityWorld();
-        if (sender instanceof EntityPlayer && !world.isRemote) {
+        if (sender instanceof EntityPlayer && !world.isRemote && canCommandSenderUseCommand(sender)) {
             SeedCopyLogger.printLogMessage("About to copy to clipboard");
-
             String seed = Long.toString(world.getSeed());
-            StringSelection selection = new StringSelection(seed);
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(selection, null);
+            copyString(seed);
             sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.success")));
             SeedCopyLogger.printLogMessage(String.format("%s has been copied to the clipboard", seed));
         } else {
@@ -57,16 +52,31 @@ public class SeedCopyCommand implements ICommand {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender) {
-        return true;
+        EntityPlayer player = (EntityPlayer) sender;
+        if (Config.onlyAllowOps) {
+            return isPlayerOpped(player);
+        } else {
+            return true;
+        }
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender p_71516_1_, String[] p_71516_2_) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] strings) {
         return null;
     }
 
     @Override
     public boolean isUsernameIndex(String[] p_82358_1_, int p_82358_2_) {
         return false;
+    }
+
+    public void copyString(String string) {
+        StringSelection selection = new StringSelection(string);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(selection, null);
+    }
+
+    public boolean isPlayerOpped(EntityPlayer player) {
+        return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
     }
 }
