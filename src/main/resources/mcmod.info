@@ -1,0 +1,16 @@
+[
+{
+  "modid": "seedcopy",
+  "name": "SeedCopy",
+  "description": "Copy your world seeds with a simple command!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["SatanicSanta"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
