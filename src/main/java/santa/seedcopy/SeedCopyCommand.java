@@ -1,5 +1,7 @@
 package santa.seedcopy;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.stream.TwitchStream;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,6 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import tv.twitch.chat.ChatMessage;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -27,7 +30,11 @@ public class SeedCopyCommand implements ICommand {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "copyseed";
+        if (Config.enableTwitchInteraction) {
+            return "copyseed <twitch (optional)>";
+        } else {
+            return "copyseed";
+        }
     }
 
     @Override
@@ -40,8 +47,20 @@ public class SeedCopyCommand implements ICommand {
         SeedCopyLogger.printLogMessage("About to be processed");
         World world = sender.getEntityWorld();
         if (sender instanceof EntityPlayer && !world.isRemote && canCommandSenderUseCommand(sender)) {
-            SeedCopyLogger.printLogMessage("About to copy to clipboard");
             String seed = Long.toString(world.getSeed());
+
+            if (Config.enableTwitchInteraction && Minecraft.getMinecraft().func_152346_Z() instanceof TwitchStream && args[0] == "twitch") {
+                String worldName = world.getWorldInfo().getWorldName();
+                String message = StatCollector.translateToLocalFormatted("command.twitch", new Object[] { worldName, seed });
+                TwitchStream stream = (TwitchStream) Minecraft.getMinecraft().func_152346_Z();
+                ChatMessage chat[] = new ChatMessage[0];
+                chat[0].userName = worldName;
+                chat[0].message = message;
+                chat[0].action = true;
+                stream.func_152903_a(chat);
+            }
+
+            SeedCopyLogger.printLogMessage("About to copy to clipboard");
             copyString(seed);
             sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.success")));
             SeedCopyLogger.printLogMessage(String.format("%s has been copied to the clipboard", seed));

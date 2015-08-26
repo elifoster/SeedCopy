@@ -1,2 +1,3 @@
 command.sucess=¡La semilla no ha copiado exitosamente a tus portapapeles!
 command.failure=¡El remitente del comando no es un jugador, y/o el mundo no es un servidor! ¡Ha fallado a copiar!
+command.twitch=La semilla de %s es: %s

@@ -12,6 +12,7 @@ public class Config {
 
     public static boolean enableLogging;
     public static boolean onlyAllowOps;
+    public static boolean enableTwitchInteraction;
 
     public static void load(FMLPreInitializationEvent event) {
         File configurationDir = ReflectionHelper.getPrivateValue(FMLPreInitializationEvent.class, event, 2);
@@ -29,6 +30,7 @@ public class Config {
 
         enableLogging = config.get("Toggle", "Enable debug logging", false).getBoolean(false);
         onlyAllowOps = config.get("Toggle", "When true, only operators (ops) will be able to use the command", false).getBoolean(false);
+        enableTwitchInteraction = config.get("Toggle", "Enable Twitch feature (see wiki)", true).getBoolean(true);
 
         config.save();
     }
