@@ -1,6 +1,7 @@
 package santa.seedcopy;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.stream.ChatController;
 import net.minecraft.client.stream.TwitchStream;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -52,12 +53,9 @@ public class SeedCopyCommand implements ICommand {
             if (Config.enableTwitchInteraction && Minecraft.getMinecraft().func_152346_Z() instanceof TwitchStream && args[0] == "twitch") {
                 String worldName = world.getWorldInfo().getWorldName();
                 String message = StatCollector.translateToLocalFormatted("command.twitch", new Object[] { worldName, seed });
-                TwitchStream stream = (TwitchStream) Minecraft.getMinecraft().func_152346_Z();
-                ChatMessage chat[] = new ChatMessage[0];
-                chat[0].userName = worldName;
-                chat[0].message = message;
-                chat[0].action = true;
-                stream.func_152903_a(chat);
+                ChatController chat = new ChatController();
+                chat.func_152991_c();
+                chat.func_152992_g(message);
             }
 
             SeedCopyLogger.printLogMessage("About to copy to clipboard");
