@@ -7,23 +7,18 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import tv.twitch.chat.ChatMessage;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.Collections;
 import java.util.List;
 
 public class SeedCopyCommand implements ICommand {
-
-    @Override
-    public int compareTo(Object object) {
-        return 0;
-    }
-
     @Override
     public String getCommandName() {
         return "copyseed";
@@ -39,8 +34,8 @@ public class SeedCopyCommand implements ICommand {
     }
 
     @Override
-    public List getCommandAliases() {
-        return null;
+    public List<String> getCommandAliases() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -50,12 +45,13 @@ public class SeedCopyCommand implements ICommand {
         if (sender instanceof EntityPlayer && !world.isRemote && canCommandSenderUseCommand(sender)) {
             String seed = Long.toString(world.getSeed());
 
-            if (Config.enableTwitchInteraction && Minecraft.getMinecraft().func_152346_Z() instanceof TwitchStream && args[0] == "twitch") {
+            if (Config.enableTwitchInteraction && Minecraft.getMinecraft().getTwitchStream()
+              instanceof TwitchStream && args.length > 0 && args[0].equals("twitch")) {
                 String worldName = world.getWorldInfo().getWorldName();
-                String message = StatCollector.translateToLocalFormatted("command.twitch", new Object[] { worldName, seed });
+                String message = StatCollector.translateToLocalFormatted("command.twitch", worldName, seed);
                 ChatController chat = new ChatController();
-                chat.func_152991_c();
-                chat.func_152992_g(message);
+                chat.func_175984_n();
+                chat.func_175986_a(sender.getName(), message);
             }
 
             SeedCopyLogger.printLogMessage("About to copy to clipboard");
@@ -70,15 +66,11 @@ public class SeedCopyCommand implements ICommand {
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender) {
         EntityPlayer player = (EntityPlayer) sender;
-        if (Config.onlyAllowOps) {
-            return isPlayerOpped(player);
-        } else {
-            return true;
-        }
+        return !Config.onlyAllowOps || isPlayerOpped(player);
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] strings) {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         return null;
     }
 
@@ -94,6 +86,12 @@ public class SeedCopyCommand implements ICommand {
     }
 
     public boolean isPlayerOpped(EntityPlayer player) {
-        return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
+        return MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile());
+    }
+
+    @SuppressWarnings("NullableProblems")
+    @Override
+    public int compareTo(ICommand o) {
+        return 0;
     }
 }
