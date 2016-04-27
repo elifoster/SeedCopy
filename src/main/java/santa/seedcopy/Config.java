@@ -9,7 +9,6 @@ public class Config {
 
     public static boolean enableLogging;
     public static boolean onlyAllowOps;
-    public static boolean enableTwitchInteraction;
 
     public static void load(FMLPreInitializationEvent event) {
         File configurationDir = event.getModConfigurationDirectory();
@@ -19,7 +18,6 @@ public class Config {
 
         enableLogging = config.get("Toggle", "Enable debug logging", false).getBoolean();
         onlyAllowOps = config.get("Toggle", "When true, only operators (ops) will be able to use the command", false).getBoolean();
-        enableTwitchInteraction = config.get("Toggle", "Enable Twitch feature (see wiki)", true).getBoolean();
 
         config.save();
     }

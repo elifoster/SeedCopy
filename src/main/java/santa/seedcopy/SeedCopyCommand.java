@@ -1,15 +1,13 @@
 package santa.seedcopy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.stream.ChatController;
-import net.minecraft.client.stream.TwitchStream;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
 import java.awt.*;
@@ -26,11 +24,7 @@ public class SeedCopyCommand implements ICommand {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        if (Config.enableTwitchInteraction) {
-            return "copyseed <twitch (optional)>";
-        } else {
-            return "copyseed";
-        }
+        return "copyseed";
     }
 
     @Override
@@ -39,38 +33,28 @@ public class SeedCopyCommand implements ICommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) {
         SeedCopyLogger.printLogMessage("About to be processed");
         World world = sender.getEntityWorld();
-        if (sender instanceof EntityPlayer && !world.isRemote && canCommandSenderUseCommand(sender)) {
+        if (sender instanceof EntityPlayer && !world.isRemote && checkPermission(server, sender)) {
             String seed = Long.toString(world.getSeed());
-
-            if (Config.enableTwitchInteraction && Minecraft.getMinecraft().getTwitchStream()
-              instanceof TwitchStream && args.length > 0 && args[0].equals("twitch")) {
-                String worldName = world.getWorldInfo().getWorldName();
-                String message = StatCollector.translateToLocalFormatted("command.twitch", worldName, seed);
-                ChatController chat = new ChatController();
-                chat.func_175984_n();
-                chat.func_175986_a(sender.getName(), message);
-            }
 
             SeedCopyLogger.printLogMessage("About to copy to clipboard");
             copyString(seed);
-            sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.success")));
+            sender.addChatMessage(new TextComponentString(I18n.translateToLocal("command.success")));
             SeedCopyLogger.printLogMessage(String.format("%s has been copied to the clipboard", seed));
         } else {
-            sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.failure")));
+            sender.addChatMessage(new TextComponentString(I18n.translateToLocal("command.failure")));
         }
     }
 
     @Override
-    public boolean canCommandSenderUseCommand(ICommandSender sender) {
-        EntityPlayer player = (EntityPlayer) sender;
-        return !Config.onlyAllowOps || isPlayerOpped(player);
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+        return !Config.onlyAllowOps || isPlayerOpped(server, sender.getName());
     }
 
     @Override
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
         return null;
     }
 
@@ -85,8 +69,13 @@ public class SeedCopyCommand implements ICommand {
         clipboard.setContents(selection, null);
     }
 
-    public boolean isPlayerOpped(EntityPlayer player) {
-        return MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile());
+    public boolean isPlayerOpped(MinecraftServer server, String name) {
+        for (String n : server.getPlayerList().getOppedPlayerNames()) {
+            if (n.equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SuppressWarnings("NullableProblems")
