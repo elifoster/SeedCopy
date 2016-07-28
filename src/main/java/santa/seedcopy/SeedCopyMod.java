@@ -4,11 +4,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
-@Mod(name = SeedCopyMod.NAME, modid = SeedCopyMod.MODID, version = SeedCopyMod.VERSION, acceptedMinecraftVersions = "[1.9,1.10]")
+@Mod(name = SeedCopyMod.NAME, modid = SeedCopyMod.MODID, version = SeedCopyMod.VERSION, acceptedMinecraftVersions = "[1.9,1.10.2]")
 public class SeedCopyMod {
     public static final String NAME = "SeedCopy";
     public static final String MODID = "seedcopy";
-    public static final String VERSION = "3.0.1";
+    public static final String VERSION = "3.0.2";
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
